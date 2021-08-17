@@ -1,0 +1,57 @@
+version: "3"
+services:
+  app1:
+    build:
+      context: app1/
+      dockerfile: ../docker/app1/Dockerfile
+    env_file:
+      app1/.env.development
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - app1-db
+    links:
+      - app2
+    tty: true
+    stdin_open: true
+    command: /bin/sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+  app1-db:
+    image: postgres
+    volumes:
+      - psgl_data1:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+  app2:
+    build:
+      context: app2/
+      dockerfile: ../docker/app2/Dockerfile
+    env_file:
+      app2/.env.development
+    depends_on:
+      - app2-db
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/usr/src/app
+    links:
+      - app1
+    tty: true
+    stdin_open: true
+    command: /bin/sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3001 -b '0.0.0.0'"
+  app2-db:
+    image: postgres
+    volumes:
+      - psgl_data2:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5433:5432
+volumes:
+  psgl_data1:
+  psgl_data2:
