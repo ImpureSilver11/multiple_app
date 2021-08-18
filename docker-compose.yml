@@ -9,7 +9,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/usr/src/app
+      - ./app1:/usr/src/app
     depends_on:
       - app1-db
     links:
@@ -37,7 +37,7 @@ services:
     ports:
       - "3001:3000"
     volumes:
-      - .:/usr/src/app
+      - ./app2:/usr/src/app
     links:
       - app1
     tty: true
